@@ -64,4 +64,3 @@ namespace Timer_Printer
         }
     }
 }
-// host -- streamWriter - take timer from app setting - stringBuilder
