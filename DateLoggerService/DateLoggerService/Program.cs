@@ -10,6 +10,7 @@ Host.CreateDefaultBuilder(args)
         services.Configure<TimeInterval>(
             hostContext.Configuration.GetSection("TimeInterval"));
 
+        services.AddHttpClient(); // Add HttpClient for sending requests
         services.AddHostedService<Worker>();
     })
     .Build()

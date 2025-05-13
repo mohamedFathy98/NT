@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NumbersAPI.DataServiceLayer;
+using NumbersAPI.Models;
 
 namespace NumbersAPI.Controllers
 {
@@ -16,18 +17,18 @@ namespace NumbersAPI.Controllers
             this.subtractNumberDSL = subtractNumberDSL;
         }
 
-        [HttpGet("AddNumbers")] //endpoint For Adding
-        public IActionResult Sum(int a, int b)
+        [HttpPost("AddNumbers")] //endpoint For Adding
+        public IActionResult AddNumbers([FromBody] NumberInput model)
         {
-            var result = addNumbersDSL.Sum(a, b); // Calls the Sum method in AddNumbersDSL
-            return Ok(result);
+            int sum = model.a + model.b;
+            return Ok(new { sum });
         }
 
         [HttpPost("subtractNumber")] //endpoint For subtract
-        public IActionResult Subtract(int a, int b)
+        public IActionResult subtractNumbers([FromBody] NumberInput model)
         {
-            var result = subtractNumberDSL.Subtract(a, b); // Calls the Subtract method in SubtractNumberDSL
-            return Ok(result);
+            int sub = model.a - model.b;
+            return Ok(new { sub });
         }
 
     }
