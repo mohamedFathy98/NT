@@ -1,0 +1,106 @@
+﻿
+using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+
+namespace OrderTask.Models
+{
+    public class Context : DbContext
+    {
+        public Context(DbContextOptions<Context> options) : base(options)
+        {
+        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+
+        //}
+        //=> optionsBuilder.UseSqlServer("server = . ; database = OrderTask; Trusted_Connection = true ; trust server certificate = true "); //Trusted server Certificate adding it to connection string after .net 7 
+
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<City> Cities { get; set; }
+        public DbSet<Governorate> governorates { get; set; }
+        public DbSet<Product> products { get; set; }
+        public DbSet<ProductOrder> productOrders { get; set; }
+
+
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+
+        //    modelBuilder.Entity<Product>(entity =>
+        //    {
+        //        entity.HasKey(P => P.Id);
+
+        //        entity.Property(P => P.Name)
+        //        .HasColumnName("Product Name")
+        //        .HasMaxLength(50)
+        //        .IsRequired(true);
+
+        //        entity.Property(P => P.Price)
+        //        .HasColumnType("decimal(18,5)")
+        //        .IsRequired(true);
+
+        //        entity.HasMany<Order>()
+        //        .WithMany()
+        //        .UsingEntity<ProductOrder>()
+        //        .HasKey(PO => new { PO.ProductId, PO.OrderId });
+
+
+        //    });
+
+        //    modelBuilder.Entity<City>().HasKey(c => c.Id);
+        //    modelBuilder.Entity<City>().Property(c => c.Name)
+        //        .HasColumnName(@"CITY")
+        //        .HasMaxLength(50)
+        //        .IsRequired(true);
+
+
+        //    modelBuilder.Entity<Governorate>().HasKey(G => G.Id);
+        //    modelBuilder.Entity<Governorate>().Property(G => G.Name)
+        //        .HasColumnName(@"GOVERNORATE")
+        //        .HasMaxLength(50)
+        //        .IsRequired(true);
+
+
+
+        //    //seed data 
+
+
+
+
+
+
+
+
+
+        //    modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        //}
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Governorate)
+                .WithMany()
+                .HasForeignKey(o => o.GovernorateId);
+
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.City)
+                .WithMany(c => c.Orders)
+                .HasForeignKey(o => o.CityId);
+
+            
+
+            modelBuilder.Entity<ProductOrder>()
+                .HasKey(op => new { op.ProductId, op.OrderId });
+
+            modelBuilder.Entity<ProductOrder>()
+                .HasOne(op => op.Product)
+                .WithMany(p => p.ProductOrders)
+                .HasForeignKey(op => op.ProductId);
+
+            modelBuilder.Entity<ProductOrder>()
+                .HasOne(op => op.Order)
+                .WithMany(o => o.ProductOrders)
+                .HasForeignKey(op => op.OrderId);
+
+        }
+    }
+}
