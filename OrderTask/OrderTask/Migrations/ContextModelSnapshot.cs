@@ -30,7 +30,6 @@ namespace OrderTask.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("GovernorateId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
