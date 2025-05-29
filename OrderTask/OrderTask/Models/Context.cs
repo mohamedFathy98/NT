@@ -9,6 +9,9 @@ namespace OrderTask.Models
         public Context(DbContextOptions<Context> options) : base(options)
         {
         }
+        
+            
+       
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
 
@@ -86,7 +89,11 @@ namespace OrderTask.Models
                 .WithMany(c => c.Orders)
                 .HasForeignKey(o => o.CityId);
 
-            
+            //modelBuilder.Entity<City>()
+            //.HasOne(c => c.Governorate)
+            //.WithMany() // No collection navigation on Governorate side
+            //.HasForeignKey(c => c.GovernorateId)
+            //.OnDelete(DeleteBehavior.Restrict); // Avoid cascade delete issues
 
             modelBuilder.Entity<ProductOrder>()
                 .HasKey(op => new { op.ProductId, op.OrderId });
@@ -101,6 +108,7 @@ namespace OrderTask.Models
                 .WithMany(o => o.ProductOrders)
                 .HasForeignKey(op => op.OrderId);
 
+           
         }
     }
 }

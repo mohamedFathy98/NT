@@ -1,4 +1,4 @@
--- Insert into Governorates (30)
+
 INSERT INTO Governorates ( Name) VALUES
 ( 'Cairo Governorate'),
 ( 'Alexandria Governorate'),

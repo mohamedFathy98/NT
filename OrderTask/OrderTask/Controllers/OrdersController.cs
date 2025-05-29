@@ -47,7 +47,8 @@ namespace OrderTask.Controllers
                     case "price":
                         if (decimal.TryParse(searchString, out decimal price))
                         {
-                            orders = orders.Where(o => o.ProductOrders.Any(op => op.Product.Price == price));
+                            //orders = orders.Where(o => o.ProductOrders.Any(op => op.Product.Price == price));
+                            orders = orders.Where(o => o.ProductOrders.Sum(p => p.Product.Price) == price || o.ProductOrders.Any(op => op.Product.Price == price));
                         }
                         break;
                     default:
@@ -86,6 +87,36 @@ namespace OrderTask.Controllers
             return View(paginatedOrders);
         }
 
-     
+        // GET: Orders/Create
+        public IActionResult Create()
+        {
+            //retrive data from db to dp
+            ViewBag.Governorates = new SelectList(_context.governorates, "Id", "Name");
+            ViewBag.Cities = new SelectList(_context.Cities, "Id", "Name");
+            ViewBag.Products = _context.products.ToList();
+            return View();
+        }
+
+        // POST: Orders/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Order order, List<int> productIds)
+        {
+            if (ModelState.IsValid)
+            {
+                order.DateTime = DateTime.Now; 
+                _context.Orders.Add(order);
+                await _context.SaveChangesAsync();
+
+                foreach (var productId in productIds)
+                {
+                    _context.productOrders.Add(new ProductOrder { OrderId = order.Id, ProductId = productId });
+                }
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(order);
+        }
     }
 }

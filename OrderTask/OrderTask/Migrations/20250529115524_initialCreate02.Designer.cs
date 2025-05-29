@@ -12,8 +12,8 @@ using OrderTask.Models;
 namespace OrderTask.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20250525150150_changeConnection2")]
-    partial class changeConnection2
+    [Migration("20250529115524_initialCreate02")]
+    partial class initialCreate02
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,9 +35,7 @@ namespace OrderTask.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("CITY");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -54,9 +52,7 @@ namespace OrderTask.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("GOVERNORATE");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -71,17 +67,21 @@ namespace OrderTask.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CityId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("GovernorateId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -106,12 +106,10 @@ namespace OrderTask.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("Product Name");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,5)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -126,10 +124,6 @@ namespace OrderTask.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("ProductId", "OrderId");
 
                     b.HasIndex("OrderId");
@@ -140,13 +134,13 @@ namespace OrderTask.Migrations
             modelBuilder.Entity("OrderTask.Models.Order", b =>
                 {
                     b.HasOne("OrderTask.Models.City", "City")
-                        .WithMany("orders")
+                        .WithMany("Orders")
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("OrderTask.Models.Governorate", "Governorate")
-                        .WithMany("orders")
+                        .WithMany()
                         .HasForeignKey("GovernorateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -159,13 +153,13 @@ namespace OrderTask.Migrations
             modelBuilder.Entity("OrderTask.Models.ProductOrder", b =>
                 {
                     b.HasOne("OrderTask.Models.Order", "Order")
-                        .WithMany()
+                        .WithMany("ProductOrders")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("OrderTask.Models.Product", "Product")
-                        .WithMany()
+                        .WithMany("ProductOrders")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -177,12 +171,17 @@ namespace OrderTask.Migrations
 
             modelBuilder.Entity("OrderTask.Models.City", b =>
                 {
-                    b.Navigation("orders");
+                    b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("OrderTask.Models.Governorate", b =>
+            modelBuilder.Entity("OrderTask.Models.Order", b =>
                 {
-                    b.Navigation("orders");
+                    b.Navigation("ProductOrders");
+                });
+
+            modelBuilder.Entity("OrderTask.Models.Product", b =>
+                {
+                    b.Navigation("ProductOrders");
                 });
 #pragma warning restore 612, 618
         }
