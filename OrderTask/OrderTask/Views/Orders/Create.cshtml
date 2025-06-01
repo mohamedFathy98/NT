@@ -32,12 +32,14 @@
 
     <div class="form-group">
         <label class="control-label">Products</label>
-        <select multiple name="productIds" class="form-control">
-            @foreach (var product in ViewBag.Products as List<Product>)
-            {
-                <option value="@product.Id">ID : @product.Id  (Name : @product.Name)  (Price :  @product.Price)</option>
-            }
-        </select>
+        @foreach (var product in ViewBag.Products as List<Product>)
+        {
+            <div class="form-check">
+                <input type="checkbox" name="selectedProducts" value="@product.Id" class="form-check-input" id="product_@product.Id" />
+                <label class="form-check-label" for="product_@product.Id">@product.Name (Price: @product.Price.ToString("C"))</label>
+                <input type="number" name="quantities[@product.Id]" min="1" value="1" class="form-control d-inline-block w-auto ml-2" style="width: 80px;" />
+            </div>
+        }
     </div>
 
     <div class="form-group">

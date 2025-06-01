@@ -21,5 +21,14 @@
         public City? City { get; set; }
 
         public ICollection<ProductOrder>? ProductOrders { get; set; }
+        public DateTime CreatedAt { get; set; } // New property for creation timestamp
+
+        
+
+        //public int UserId { get; set; } // Foreign key to User
+        //public User User { get; set; } // Navigation property
+
+        //public DateTime CreatedDate { get; set; }
+        //public DateTime ModifiedDate { get; set; }
     }
 }

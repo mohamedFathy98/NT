@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OrderTask.Models;
 
@@ -21,6 +22,7 @@ public class ProductsController : Controller
 
 
     // GET: Products/Create
+    //[Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
         return View();
@@ -29,10 +31,12 @@ public class ProductsController : Controller
     // POST: Products/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
+
     public async Task<IActionResult> Create(Product product)
     {
         if (ModelState.IsValid)
         {
+            product.CreatedAt = DateTime.Now;
             _context.Add(product);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -87,6 +91,7 @@ public class ProductsController : Controller
     {
         if (ModelState.IsValid)
         {
+            
             _context.Remove(product);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

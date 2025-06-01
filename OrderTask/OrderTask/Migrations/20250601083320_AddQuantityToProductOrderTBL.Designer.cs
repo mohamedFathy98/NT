@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OrderTask.Models;
 
@@ -11,9 +12,11 @@ using OrderTask.Models;
 namespace OrderTask.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20250601083320_AddQuantityToProductOrderTBL")]
+    partial class AddQuantityToProductOrderTBL
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -138,41 +141,6 @@ namespace OrderTask.Migrations
                     b.HasIndex("OrderId");
 
                     b.ToTable("productOrders");
-                });
-
-            modelBuilder.Entity("OrderTask.Models.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("User");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Password = "password123",
-                            UserName = "admin"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Password = "pass456",
-                            UserName = "user1"
-                        });
                 });
 
             modelBuilder.Entity("OrderTask.Models.City", b =>

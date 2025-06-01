@@ -17,6 +17,7 @@ namespace OrderTask.Controllers
         // GET: Orders with Search and Pagination
         public async Task<IActionResult> Index(string searchString, string searchField, int page = 1)
         {
+
             var orders = _context.Orders
                 .Include(o => o.Governorate)
                 .Include(o => o.City)
@@ -91,6 +92,7 @@ namespace OrderTask.Controllers
         public IActionResult Create()
         {
             //retrive data from db to dp
+            
             ViewBag.Governorates = new SelectList(_context.governorates, "Id", "Name");
             ViewBag.Cities = new SelectList(_context.Cities, "Id", "Name");
             ViewBag.Products = _context.products.ToList();
@@ -100,17 +102,31 @@ namespace OrderTask.Controllers
         // POST: Orders/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Order order, List<int> productIds)
+        public async Task<IActionResult> Create(Order order, List<int> selectedProducts, Dictionary<int, int> quantities)
         {
+            
             if (ModelState.IsValid)
             {
-                order.DateTime = DateTime.Now; 
+                order.CreatedAt = DateTime.Now;
+                
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
 
-                foreach (var productId in productIds)
+                if (selectedProducts != null)
                 {
-                    _context.productOrders.Add(new ProductOrder { OrderId = order.Id, ProductId = productId });
+                    foreach (var productId in selectedProducts)
+                    {
+                        // Get the quantity for this product, default to 1 if not specified
+                        int quantity = quantities.ContainsKey(productId) ? quantities[productId] : 1;
+                        if (quantity < 1) quantity = 1; // Ensure quantity is at least 1
+                        _context.productOrders.Add(new ProductOrder
+                        {
+                            OrderId = order.Id,
+                            ProductId = productId,
+                            Quantity = quantity
+                        });
+                    }
+                    await _context.SaveChangesAsync();
                 }
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

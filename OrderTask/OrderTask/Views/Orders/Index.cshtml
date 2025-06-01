@@ -35,8 +35,8 @@
             <th>Governorate</th>
             <th>City</th>
             <th>Products</th>
-            <td>Created By</td>
-            <td>Created At</td>
+            <th>Created At</th>
+            <th>Created By</th>
         </tr>
     </thead>
     <tbody>
@@ -52,11 +52,12 @@
                 <td>
                     @foreach (var op in order.ProductOrders)
                     {
-                        <span>@op.Product.Name (ID: @op.ProductId, Price: @op.Product.Price.ToString("C"))<br /></span>
+                        <span>@op.Product.Name (ID: @op.ProductId, Price: @op.Product.Price.ToString("C"), Quantity: @op.Quantity)<br /></span>
                     }
                 </td>
-                <td></td>  //AUTO GENERATED
-                <td></td>  //AUTO GENERATED
+                <td>@order.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                <td></td>
+                
             </tr>
         }
     </tbody>

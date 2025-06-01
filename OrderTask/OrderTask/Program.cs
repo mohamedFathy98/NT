@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using OrderTask.Models;
@@ -18,12 +19,14 @@ namespace OrderTask
             builder.Services.AddDbContext<Context>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Add logging
-            builder.Services.AddLogging(logging =>
+            // Add session services
+            builder.Services.AddSession(options =>
             {
-                logging.AddConsole();
-                logging.AddDebug();
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
             });
+
 
             var app = builder.Build();
 
@@ -39,8 +42,9 @@ namespace OrderTask
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseSession();
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.MapControllerRoute(
                 name: "default",
