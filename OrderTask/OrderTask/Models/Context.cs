@@ -2,13 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using OrderTask.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace OrderTask.Models
 {
-    public class Context : DbContext
+    public class Context : IdentityDbContext<User>
     {
         public Context(DbContextOptions<Context> options) : base(options)
         {
+
         }
 
 
@@ -24,6 +26,8 @@ namespace OrderTask.Models
         public DbSet<Product> products { get; set; }
         public DbSet<ProductOrder> productOrders { get; set; }
         public DbSet<User> users { get; set; }
+
+
 
 
 
@@ -81,6 +85,9 @@ namespace OrderTask.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Always call the base method to ensure Identity tables are configured
+
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Governorate)
                 .WithMany()
@@ -106,6 +113,7 @@ namespace OrderTask.Models
                 .HasKey(op => new { op.ProductId, op.OrderId });
 
             modelBuilder.Entity<ProductOrder>()
+
                 .HasOne(op => op.Product)
                 .WithMany(p => p.ProductOrders)
                 .HasForeignKey(op => op.ProductId);
@@ -115,13 +123,10 @@ namespace OrderTask.Models
                 .WithMany(o => o.ProductOrders)
                 .HasForeignKey(op => op.OrderId);
 
-            modelBuilder.Entity<User>().HasData(
-                new User { Id = 1, UserName = "admin", Password = "password123" },
-                new User { Id = 2, UserName = "user1", Password = "pass456" }
-    );
+
+
 
 
         }
-        public DbSet<OrderTask.Models.User> User { get; set; } = default!;
     }
 }

@@ -1,8 +1,17 @@
-﻿namespace OrderTask.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace OrderTask.Models
 {
-    public class Login
+    public class Login : IdentityUser
     {
-        public string Username { get; set; }
+        [Required(ErrorMessage = "Password is Required")]
+        [EmailAddress(ErrorMessage = "Invalid Email")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Password is Required")]
+        [DataType(DataType.Password)]
         public string Password { get; set; }
+
+        public bool RememberMe { get; set; }
     }
 }

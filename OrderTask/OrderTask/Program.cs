@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using OrderTask.Models;
 
+
 namespace OrderTask
 {
     public class Program
@@ -19,14 +20,23 @@ namespace OrderTask
             builder.Services.AddDbContext<Context>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Add session services
-            builder.Services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromMinutes(30);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-            });
+            //// Add session services
+            //builder.Services.AddSession(options =>
+            //{
+            //    options.IdleTimeout = TimeSpan.FromMinutes(30);
+            //    options.Cookie.HttpOnly = true;
+            //    options.Cookie.IsEssential = true;
+            //});
 
+            //builder.Services.AddIdentity<User, IdentityRole>()
+            //                .AddEntityFrameworkStores<Context>();
+
+            builder.Services.AddIdentity<User, IdentityRole>(
+            )
+                              .AddEntityFrameworkStores<Context>()
+                              .AddDefaultTokenProviders();
+            builder.Services.Configure<IdentityOptions>(optiion =>
+            optiion.User.RequireUniqueEmail = true);
 
             var app = builder.Build();
 
@@ -37,12 +47,12 @@ namespace OrderTask
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
-            app.UseSession();
+            //app.UseSession();
             app.UseAuthorization();
             app.UseAuthentication();
 
