@@ -23,7 +23,7 @@ namespace OrderTask
             //// Add session services
             //builder.Services.AddSession(options =>
             //{
-            //    options.IdleTimeout = TimeSpan.FromMinutes(30);
+            //    options.IdleTimeout = TimeSpan.FromDays(1);
             //    options.Cookie.HttpOnly = true;
             //    options.Cookie.IsEssential = true;
             //});
@@ -31,12 +31,25 @@ namespace OrderTask
             //builder.Services.AddIdentity<User, IdentityRole>()
             //                .AddEntityFrameworkStores<Context>();
 
-            builder.Services.AddIdentity<User, IdentityRole>(
-            )
+            builder.Services.AddIdentity<User, IdentityRole>()
                               .AddEntityFrameworkStores<Context>()
+                              .AddDefaultTokenProviders()
                               .AddDefaultTokenProviders();
+           
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+                options.SlidingExpiration = true; // Optional: refresh expiration on each request
+            });
+
+            // Configure Identity options
             builder.Services.Configure<IdentityOptions>(optiion =>
             optiion.User.RequireUniqueEmail = true);
+
+
+
+
+
 
             var app = builder.Build();
 
@@ -53,8 +66,8 @@ namespace OrderTask
 
             app.UseRouting();
             //app.UseSession();
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",

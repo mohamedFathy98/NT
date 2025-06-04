@@ -1,0 +1,21 @@
+﻿
+@{
+    ViewData["Title"] = "CheckYourInbox";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="main-agileinfo">
+	<div class="agileits-top">
+		<p>Please Check Your Inbox</p>
+		<br />
+		<p> <a asp-action="Login"> LogIn</a></p>
+
+	</div>
+</div>
+
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}

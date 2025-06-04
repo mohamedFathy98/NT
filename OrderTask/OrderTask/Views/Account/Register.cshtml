@@ -25,7 +25,7 @@
 			<br />
 			<input class="text"  asp-for="ConfirmPassword" placeholder="Confirm Password" required="">
 			<span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-			<
+			
 			
 			<div class="wthree-text">
 				<label class="anim">
@@ -45,3 +45,7 @@
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
 }
+
+			//jwt => tokens expires 1 day after log in 
+			//for every requist have the same token for this user 
+			//middelware handel all requist

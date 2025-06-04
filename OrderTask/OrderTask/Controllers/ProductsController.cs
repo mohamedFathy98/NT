@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OrderTask.Models;
 
+[Authorize]
 public class ProductsController : Controller
 {
     private readonly Context _context;
@@ -12,11 +13,10 @@ public class ProductsController : Controller
         _context = context;
     }
 
-
+    [AllowAnonymous]
     public async Task<IActionResult> Index()
     {
         var products = await _context.products.ToListAsync();
-        Console.WriteLine($"Number of products: {products.Count}"); // Debug output
         return View(products);
     }
 

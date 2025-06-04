@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OrderTask.Models;
 
 namespace OrderTask.Controllers
 {
+    [Authorize]
     public class OrdersController : Controller
     {
         private readonly Context _context;
@@ -15,6 +17,7 @@ namespace OrderTask.Controllers
         }
 
         // GET: Orders with Search and Pagination
+        [AllowAnonymous]
         public async Task<IActionResult> Index(string searchString, string searchField, int page = 1)
         {
 
@@ -89,6 +92,7 @@ namespace OrderTask.Controllers
         }
 
         // GET: Orders/Create
+        
         public IActionResult Create()
         {
             //retrive data from db to dp

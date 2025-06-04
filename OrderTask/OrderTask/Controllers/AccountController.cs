@@ -1,6 +1,7 @@
 ﻿global using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OrderTask.Models;
+using OrderTask.Utilities;
 
 namespace OrderTask.Controllers
 {
@@ -239,7 +240,7 @@ namespace OrderTask.Controllers
                 {
                     var result = _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false).Result; // Sign in the user
                     //return RedirectToAction("Index", "Orders"); // Redirect to Orders index page
-                    if (result.Succeeded)  return RedirectToAction("Index", "Orders");
+                    if (result.Succeeded)  return RedirectToAction("Index", "Home");
 
                 }
 
@@ -256,7 +257,95 @@ namespace OrderTask.Controllers
 
         #endregion
 
+        #region SignOut
 
+        public new IActionResult SignOut()
+        {
+            _signInManager.SignOutAsync();
+            return RedirectToAction(nameof(Login));
+        }
 
+        #endregion
+
+        #region ForgetPassword
+        public IActionResult ForgetPassword()
+        {
+            return View();
+        }
+        [HttpPost]
+        public IActionResult ForgetPassword(ForgetPassword model)
+        {
+            if (!ModelState.IsValid) return View(model); // Validate the model state
+            var user = _userManager.FindByEmailAsync(model.Email).Result; // Find the user by email
+            if (user is not null)
+            {
+                // Generate a password reset token
+                var token = _userManager.GeneratePasswordResetTokenAsync(user).Result;
+                // Create a reset password link (you can customize this as needed)
+                var resetLink = Url.Action("ResetPassword", "Account", new { Token = token, email = model.Email }, Request.Scheme);
+
+                var email = new EMail
+                {
+                    Subject = "Reset Password",
+                    body = $"Please reset your password by clicking here: <a href='{resetLink}'>Reset Password</a>",
+                    Recipient = model.Email
+                };
+                // Send the email  
+                MailSetting.SendMail(email);
+
+                return RedirectToAction(nameof(CheckYourInbox)); // Redirect to Login page after sending the email
+
+            }
+            ModelState.AddModelError(string.Empty, "Email not found");
+            return View(model);
+        }
+
+        #endregion
+
+        public IActionResult CheckYourInbox()
+        {
+          
+            return View();
+        }
+
+        #region ResetPassword
+        
+
+        public IActionResult ResetPassword(string email , string token)
+        {
+            if(email is null || token is null) return BadRequest();
+            TempData["Email"] = email;
+            TempData["Token"] = token;
+
+            return View();
+        }
+        [HttpPost]
+        public IActionResult ResetPassword(ResetPassword model)
+        {
+            model.Token = TempData["Token"]?.ToString()?? string.Empty; //tostrig cuz type is object and the key is string 
+            model.Email = TempData["Email"]?.ToString()?? string.Empty;
+
+            if (!ModelState.IsValid) return View();
+
+           var user = _userManager.FindByEmailAsync(model.Email).Result; // Find the user by email
+            // Check if the user exists
+            if (user is not null)
+            {
+                // Reset the password using the token
+                var result = _userManager.ResetPasswordAsync(user, model.Token, model.Password).Result;
+
+                if (result.Succeeded) return RedirectToAction(nameof(Login)); // Redirect to Login page after successful reset
+
+                
+                foreach (var item in result.Errors) ModelState.AddModelError(string.Empty, item.Description);
+                
+            } ModelState.AddModelError(string.Empty, "Email not found");
+            
+
+            return View();
+        }
+       
+        
+        #endregion
     }
 }
