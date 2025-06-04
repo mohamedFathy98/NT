@@ -33,23 +33,17 @@ namespace OrderTask
 
             builder.Services.AddIdentity<User, IdentityRole>()
                               .AddEntityFrameworkStores<Context>()
-                              .AddDefaultTokenProviders()
                               .AddDefaultTokenProviders();
            
             builder.Services.ConfigureApplicationCookie(options =>
             {
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+                options.ExpireTimeSpan = TimeSpan.FromDays(1); 
                 options.SlidingExpiration = true; // Optional: refresh expiration on each request
             });
 
             // Configure Identity options
             builder.Services.Configure<IdentityOptions>(optiion =>
             optiion.User.RequireUniqueEmail = true);
-
-
-
-
-
 
             var app = builder.Build();
 
