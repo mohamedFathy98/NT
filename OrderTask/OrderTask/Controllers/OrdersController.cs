@@ -10,10 +10,12 @@ namespace OrderTask.Controllers
     public class OrdersController : Controller
     {
         private readonly Context _context;
+        
 
-        public OrdersController(Context context)
+        public OrdersController(Context context )
         {
             _context = context;
+            
         }
 
         // GET: Orders with Search and Pagination
@@ -106,23 +108,24 @@ namespace OrderTask.Controllers
         // POST: Orders/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Order order, List<int> selectedProducts, Dictionary<int, int> quantities)
+        public async Task<IActionResult> Create(Order order, Dictionary<int, int> ProductQuantities)
         {
-            
+
             if (ModelState.IsValid)
             {
                 order.CreatedAt = DateTime.Now;
-                
+                order.CreatedBy = User.Identity?.Name;
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
 
-                if (selectedProducts != null)
+                if (ProductQuantities != null && ProductQuantities.Values.Any(q => q > 0))
                 {
-                    foreach (var productId in selectedProducts)
+                    foreach (var productQuantity in ProductQuantities)
                     {
                         // Get the quantity for this product, default to 1 if not specified
-                        int quantity = quantities.ContainsKey(productId) ? quantities[productId] : 1;
-                        if (quantity < 1) quantity = 1; // Ensure quantity is at least 1
+                        int productId = productQuantity.Key;
+                        int quantity = productQuantity.Value;
+                        if (quantity > 0)
                         _context.productOrders.Add(new ProductOrder
                         {
                             OrderId = order.Id,
@@ -133,9 +136,11 @@ namespace OrderTask.Controllers
                     await _context.SaveChangesAsync();
                 }
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+                return RedirectToAction(nameof(Index)); 
 
+                 
+
+            }
             return View(order);
         }
     }

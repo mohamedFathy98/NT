@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using OrderTask.Controllers.Base;
 using OrderTask.Models;
 
 namespace OrderTask.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
         //private readonly Context _context;
@@ -23,26 +24,6 @@ namespace OrderTask.Controllers
         {
             return View();
         }
-        public IActionResult City()
-        {
-            return View();
-        }
-        public IActionResult Product()
-        {
-            return View();
-        }
-        public IActionResult Governorate()
-        {
-            return View();
-        }
-
-        public IActionResult Order() 
-        {
-            
-            return View();
-            
-        }
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

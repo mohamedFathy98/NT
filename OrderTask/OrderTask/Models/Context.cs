@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace OrderTask.Models
 {
-    public class Context : IdentityDbContext<User>
+    public class Context : DbContext
     {
         public Context(DbContextOptions<Context> options) : base(options)
         {
@@ -85,18 +85,36 @@ namespace OrderTask.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Always call the base method to ensure Identity tables are configured
+            
 
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.Governorate)
-                .WithMany()
-                .HasForeignKey(o => o.GovernorateId);
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(u => u.Id);
+                entity.Property(u => u.Id).ValueGeneratedOnAdd();
+                entity.Property(u => u.FirstName).HasMaxLength(100).IsRequired();
+                entity.Property(u => u.LastName).HasMaxLength(100).IsRequired();
+                entity.Property(u => u.UserName).HasMaxLength(100).IsRequired();
+                entity.Property(u => u.Email).HasMaxLength(256).IsRequired();
+                entity.Property(u => u.Password).HasMaxLength(256).IsRequired();
+                entity.Property(u => u.ResetToken).HasMaxLength(256).IsRequired(false);
+                entity.Property(u => u.ResetTokenExpiry);
+            });
 
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.City)
-                .WithMany(c => c.Orders)
-                .HasForeignKey(o => o.CityId);
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.HasKey(o => o.Id);
+                entity.Property(o => o.Id).ValueGeneratedOnAdd();
+                entity.Property(o => o.Name).HasMaxLength(200).IsRequired();
+                entity.Property(o => o.Address).HasMaxLength(500);
+                entity.Property(o => o.CreatedAt).HasDefaultValueSql("GETDATE()");
+                entity.Property(o => o.CreatedBy).HasMaxLength(100).IsRequired(); // New constraint
+                entity.HasOne(o => o.Governorate)
+                    .WithMany()
+                    .HasForeignKey(o => o.GovernorateId);
+                entity.HasOne(o => o.City)
+                    .WithMany(c => c.Orders)
+                    .HasForeignKey(o => o.CityId);
+            });
 
             //modelBuilder.Entity<City>()
             //    .HasOne(c => c.Governorate)
@@ -110,14 +128,11 @@ namespace OrderTask.Models
             //.OnDelete(DeleteBehavior.Restrict); // Avoid cascade delete issues
 
             modelBuilder.Entity<ProductOrder>()
-                .HasKey(op => new { op.ProductId, op.OrderId });
-
+        .HasKey(op => new { op.ProductId, op.OrderId });
             modelBuilder.Entity<ProductOrder>()
-
                 .HasOne(op => op.Product)
                 .WithMany(p => p.ProductOrders)
                 .HasForeignKey(op => op.ProductId);
-
             modelBuilder.Entity<ProductOrder>()
                 .HasOne(op => op.Order)
                 .WithMany(o => o.ProductOrders)

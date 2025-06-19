@@ -15,9 +15,6 @@
             <th>Category</th>
              <th>Edit</th> 
              <th>Delete</th>
-            <th>Created At</th>
-            <th>Created By</th>
-            
         </tr>
     </thead>
     <tbody>
@@ -38,7 +35,7 @@
                     <a asp-action="Delete" asp-route-id="@product.Id" class="btn btn-outline-danger">Delete</a>
                 
                  </td>
-                <td>@product.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                
                  <td></td>
                 
             </tr>

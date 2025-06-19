@@ -1,4 +1,6 @@
-﻿    namespace OrderTask.Models
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+
+namespace OrderTask.Models
 {
     public class Order
     {
@@ -22,8 +24,9 @@
 
         public ICollection<ProductOrder>? ProductOrders { get; set; }
         public DateTime CreatedAt { get; set; } // New property for creation timestamp
+        [ValidateNever]
+        public string CreatedBy { get; set; } // New field for the creator's name
 
-        
 
         //public int UserId { get; set; } // Foreign key to User
         //public User User { get; set; } // Navigation property

@@ -36,12 +36,12 @@ public class ProductsController : Controller
     {
         if (ModelState.IsValid)
         {
-            product.CreatedAt = DateTime.Now;
+            
             _context.Add(product);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        
+
         var errors = ModelState.Values.SelectMany(v => v.Errors);
         foreach (var error in errors)
         {
@@ -55,7 +55,7 @@ public class ProductsController : Controller
     public async Task<IActionResult> Edit(int id)
     {
         var product = await _context.products.FindAsync(id);
-       
+
         return View(product);
     }
 
@@ -91,12 +91,14 @@ public class ProductsController : Controller
     {
         if (ModelState.IsValid)
         {
-            
+
             _context.Remove(product);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
         return View(product);
+
+        
     }
 
 }

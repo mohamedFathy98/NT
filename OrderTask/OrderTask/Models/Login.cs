@@ -2,7 +2,7 @@
 
 namespace OrderTask.Models
 {
-    public class Login : IdentityUser
+    public class Login 
     {
         [Required(ErrorMessage = "Password is Required")]
         [EmailAddress(ErrorMessage = "Invalid Email")]
