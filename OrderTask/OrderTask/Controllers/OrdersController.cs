@@ -10,20 +10,20 @@ namespace OrderTask.Controllers
     public class OrdersController : Controller
     {
         private readonly Context _context;
-        
 
-        public OrdersController(Context context )
+
+        public OrdersController(Context context)
         {
             _context = context;
-            
+
         }
 
         // GET: Orders with Search and Pagination
         [AllowAnonymous]
-        public async Task<IActionResult> Index(string searchString, string searchField, int page = 1)
+        public async Task<IActionResult> Index(string searchString, int pageNumber)
         {
 
-            var orders = _context.Orders
+            var order = _context.Orders
                 .Include(o => o.Governorate)
                 .Include(o => o.City)
                 .Include(o => o.ProductOrders)
@@ -33,72 +33,31 @@ namespace OrderTask.Controllers
             if (!string.IsNullOrEmpty(searchString))
             {
                 searchString = searchString.ToLower();
-                switch (searchField?.ToLower())
-                {
-                    case "order id":
-                        if (int.TryParse(searchString, out int orderId))
-                        {
-                            orders = orders.Where(o => o.Id == orderId);
-                        }
-                        break;
-                    case "product name":
-                        orders = orders.Where(o => o.ProductOrders.Any(op => op.Product.Name.ToLower().Contains(searchString)));
-                        break;
-                    case "city":
-                        orders = orders.Where(o => o.City.Name.ToLower().Contains(searchString));
-                        break;
-                    case "governorate":
-                        orders = orders.Where(o => o.Governorate.Name.ToLower().Contains(searchString));
-                        break;
-                    case "price":
-                        if (decimal.TryParse(searchString, out decimal price))
-                        {
-                            //orders = orders.Where(o => o.ProductOrders.Any(op => op.Product.Price == price));
-                            orders = orders.Where(o => o.ProductOrders.Sum(p => p.Product.Price) == price || o.ProductOrders.Any(op => op.Product.Price == price));
-                        }
-                        break;
-                    default:
-                        orders = orders.Where(o =>
-                            o.Name.ToLower().Contains(searchString) ||
-                            o.ProductOrders.Any(op => op.Product.Name.ToLower().Contains(searchString)) ||
-                            o.City.Name.ToLower().Contains(searchString) ||
-                            o.Governorate.Name.ToLower().Contains(searchString));
-                        break;
-                }
+                order = order.Where(o =>
+                    o.Name.ToLower().Contains(searchString) ||
+                    (o.City != null && o.City.Name.ToLower().Contains(searchString)) ||
+                    (o.Governorate != null && o.Governorate.Name.ToLower().Contains(searchString)) ||
+                    o.CreatedBy.ToLower().Contains(searchString) ||
+                    o.ProductOrders.Any(po => po.Product.Price.ToString().Contains(searchString))
+                );
             }
 
-            const int pageSize = 20;
-            var totalItems = await orders.CountAsync();
-            var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
-            var paginatedOrders = await orders
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            if (pageNumber < 1)
+            {
+                pageNumber = 1; // Ensure page number is at least 1
+            }
+            int pageSize = 10; // Adjust page size as needed
 
-            
-            var searchFields = new List<SelectListItem>
-        {
-            new SelectListItem { Value = "", Text = "All Fields", Selected = string.IsNullOrEmpty(searchField) },
-            new SelectListItem { Value = "Order Id", Text = "Order Id", Selected = searchField == "Order Id" },
-            new SelectListItem { Value = "Product Name", Text = "Product Name", Selected = searchField == "Product Name" },
-            new SelectListItem { Value = "City", Text = "City", Selected = searchField == "City" },
-            new SelectListItem { Value = "Governorate", Text = "Governorate", Selected = searchField == "Governorate" },
-            new SelectListItem { Value = "Price", Text = "Price", Selected = searchField == "Price" }
-        };
-            ViewBag.SearchFields = new SelectList(searchFields, "Value", "Text", searchField);
+            return View(await MvcPageList<Order>.CreateAsync(order, pageNumber, pageSize));
 
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = totalPages;
-
-            return View(paginatedOrders);
         }
 
         // GET: Orders/Create
-        
+
         public IActionResult Create()
         {
             //retrive data from db to dp
-            
+
             ViewBag.Governorates = new SelectList(_context.governorates, "Id", "Name");
             ViewBag.Cities = new SelectList(_context.Cities, "Id", "Name");
             ViewBag.Products = _context.products.ToList();
@@ -126,19 +85,19 @@ namespace OrderTask.Controllers
                         int productId = productQuantity.Key;
                         int quantity = productQuantity.Value;
                         if (quantity > 0)
-                        _context.productOrders.Add(new ProductOrder
-                        {
-                            OrderId = order.Id,
-                            ProductId = productId,
-                            Quantity = quantity
-                        });
+                            _context.productOrders.Add(new ProductOrder
+                            {
+                                OrderId = order.Id,
+                                ProductId = productId,
+                                Quantity = quantity
+                            });
                     }
                     await _context.SaveChangesAsync();
                 }
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index)); 
+                return RedirectToAction(nameof(Index));
 
-                 
+
 
             }
             return View(order);

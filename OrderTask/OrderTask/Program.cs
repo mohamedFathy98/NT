@@ -4,8 +4,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using OrderTask.Models;
 using OrderTask.Utilities;
+//using OrderTask.Services.IServices;
+//using OrderTask.Services;
 
-namespace OrderTask
+namespace OrderTaskServices
 {
     public class Program
     {
@@ -15,9 +17,10 @@ namespace OrderTask
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-
+            //builder.Services.AddScoped<IOrderService, OrderService>();
+            //builder.Services.AddScoped<IProductService, ProductService>();
+            //builder.Services.AddScoped<ISearchService, SearchService>();
             builder.Services.AddScoped<TokenManager>();
-
             // Register DbContext
             builder.Services.AddDbContext<Context>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

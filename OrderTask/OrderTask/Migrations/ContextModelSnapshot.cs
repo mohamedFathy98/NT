@@ -41,7 +41,7 @@ namespace OrderTask.Migrations
 
                     b.HasIndex("GovernorateId");
 
-                    b.ToTable("Cities");
+                    b.ToTable("Cities", (string)null);
                 });
 
             modelBuilder.Entity("OrderTask.Models.Governorate", b =>
@@ -58,7 +58,7 @@ namespace OrderTask.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("governorates");
+                    b.ToTable("governorates", (string)null);
                 });
 
             modelBuilder.Entity("OrderTask.Models.Order", b =>
@@ -102,7 +102,7 @@ namespace OrderTask.Migrations
 
                     b.HasIndex("GovernorateId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("OrderTask.Models.Product", b =>
@@ -124,7 +124,7 @@ namespace OrderTask.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("products");
+                    b.ToTable("products", (string)null);
                 });
 
             modelBuilder.Entity("OrderTask.Models.ProductOrder", b =>
@@ -142,7 +142,7 @@ namespace OrderTask.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("productOrders");
+                    b.ToTable("productOrders", (string)null);
                 });
 
             modelBuilder.Entity("OrderTask.Models.User", b =>
@@ -187,7 +187,7 @@ namespace OrderTask.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("OrderTask.Models.City", b =>
