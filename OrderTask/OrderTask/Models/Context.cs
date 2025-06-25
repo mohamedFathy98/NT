@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using OrderTask.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using OrderTask.ViewModel;
 
 namespace OrderTask.Models
 {

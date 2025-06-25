@@ -4,6 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using OrderTask.Models;
 using OrderTask.Utilities;
+using OrderTask.Services.IServices;
+using OrderTask.Services;
 //using OrderTask.Services.IServices;
 //using OrderTask.Services;
 
@@ -17,8 +19,8 @@ namespace OrderTaskServices
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            //builder.Services.AddScoped<IOrderService, OrderService>();
-            //builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
             //builder.Services.AddScoped<ISearchService, SearchService>();
             builder.Services.AddScoped<TokenManager>();
             // Register DbContext

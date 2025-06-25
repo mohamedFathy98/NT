@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OrderTask.Models;
+using OrderTask.ViewModel;
 
 namespace OrderTask.Controllers
 {
@@ -10,12 +11,12 @@ namespace OrderTask.Controllers
     public class OrdersController : Controller
     {
         private readonly Context _context;
+        private readonly IOrderService _orderService;
 
-
-        public OrdersController(Context context)
+        public OrdersController(Context context, IOrderService orderService)
         {
             _context = context;
-
+            _orderService = orderService;
         }
 
         // GET: Orders with Search and Pagination
@@ -57,50 +58,32 @@ namespace OrderTask.Controllers
         public IActionResult Create()
         {
             //retrive data from db to dp
-
-            ViewBag.Governorates = new SelectList(_context.governorates, "Id", "Name");
-            ViewBag.Cities = new SelectList(_context.Cities, "Id", "Name");
-            ViewBag.Products = _context.products.ToList();
-            return View();
+            var viewModel = new ProductOrderViewModel
+            {
+                Products = _context.products.ToList(),
+                Governorates = _context.governorates.ToList(),
+                Cities = _context.Cities.ToList()
+            };
+            return View(viewModel);
         }
 
         // POST: Orders/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Order order, Dictionary<int, int> ProductQuantities)
+        public async Task<IActionResult> Create(ProductOrderViewModel viewModel)
         {
-
             if (ModelState.IsValid)
             {
-                order.CreatedAt = DateTime.Now;
-                order.CreatedBy = User.Identity?.Name;
-                _context.Orders.Add(order);
-                await _context.SaveChangesAsync();
-
-                if (ProductQuantities != null && ProductQuantities.Values.Any(q => q > 0))
-                {
-                    foreach (var productQuantity in ProductQuantities)
-                    {
-                        // Get the quantity for this product, default to 1 if not specified
-                        int productId = productQuantity.Key;
-                        int quantity = productQuantity.Value;
-                        if (quantity > 0)
-                            _context.productOrders.Add(new ProductOrder
-                            {
-                                OrderId = order.Id,
-                                ProductId = productId,
-                                Quantity = quantity
-                            });
-                    }
-                    await _context.SaveChangesAsync();
-                }
-                await _context.SaveChangesAsync();
+                await _orderService.CreateOrderAsync(viewModel, User.Identity?.Name ?? "Unknown");
                 return RedirectToAction(nameof(Index));
-
-
-
             }
-            return View(order);
+
+            // Repopulate lists if model state is invalid
+            viewModel.Products = _context.products.ToList();
+            viewModel.Governorates = _context.governorates.ToList();
+            viewModel.Cities = _context.Cities.ToList();
+            return View(viewModel);
         }
+
     }
 }

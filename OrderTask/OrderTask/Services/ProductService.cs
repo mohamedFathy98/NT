@@ -1,31 +1,70 @@
-﻿//using Microsoft.EntityFrameworkCore;
-//using OrderTask.Models;
-//using OrderTask.Services.IServices;
-//using System.Threading.Tasks;
+﻿using OrderTask.Models;
+using OrderTask.Services.IServices;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-//namespace OrderTask.Services
-//{
-//    public class ProductService : IProductService
-//    {
-//        private readonly Context _context;
-//        private readonly ISearchService _searchService;
+namespace OrderTask.Services
+{
+    public class ProductService : IProductService
+    {
+        private readonly Context _context;
 
-//        public ProductService(Context context, ISearchService searchService)
-//        {
-//            _context = context;
-//            _searchService = searchService;
-//        }
+        public ProductService(Context context)
+        {
+            _context = context;
+        }
 
-//        public async Task<List<Product>> GetProductsAsync(string searchString, string searchField, int page = 1, int pageSize = 10)
-//        {
-//            var query = _context.products.AsQueryable();
-//            return await _searchService.SearchAsync(query, searchString, searchField, page, pageSize);
-//        }
+        public async Task<MvcPageList<Product>> GetProductsAsync(string searchString, int pageNumber, int pageSize)
+        {
+            if (pageNumber < 1)
+                pageNumber = 1;
 
-//        public async Task<int> GetTotalProductsAsync(string searchString, string searchField)
-//        {
-//            var query = _context.products.AsQueryable();
-//            return await _searchService.GetTotalCountAsync(query, searchString, searchField);
-//        }
-//    }
-//}
+            var products = _context.products.AsQueryable();
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.ToLower();
+                products = products.Where(p => p.Name.ToLower().Contains(searchString) ||
+                                               p.Description.ToLower().Contains(searchString));
+            }
+            return await MvcPageList<Product>.CreateAsync(products, pageNumber, pageSize);
+        }
+
+
+        public async Task<int> GetTotalProductsAsync(string searchString)
+        {
+            var products = _context.products.AsQueryable();
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.ToLower();
+                products = products.Where(p => p.Name.ToLower().Contains(searchString) ||
+                                               p.Description.ToLower().Contains(searchString));
+            }
+            return await products.CountAsync();
+        }
+
+        public async Task<Product> GetProductByIdAsync(int id)
+        {
+            return await _context.products.FindAsync(id);
+        }
+
+        public async Task CreateProductAsync(Product product)
+        {
+            _context.products.Add(product);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateProductAsync(Product product)
+        {
+            _context.products.Update(product);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteProductAsync(Product product)
+        {
+            _context.products.Remove(product);
+            await _context.SaveChangesAsync();
+        }
+    }
+}

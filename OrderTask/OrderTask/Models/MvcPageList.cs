@@ -13,6 +13,7 @@ namespace OrderTask.Models
         {
             if (items != null && items.Any())
             {
+                Items = items ?? new List<T>();
                 PageIndex = pageIndex;
                 TotalPages = (int)Math.Ceiling(count / (double)pageSize);
                 Items = items;

@@ -1,11 +1,14 @@
-﻿//using OrderTask.Models;
+﻿using OrderTask.Models;
 
-//namespace OrderTask.Services.IServices
-//{
-//    public interface IProductService 
-//    {
-//        Task<List<Product>> GetProductsAsync(string searchString, string searchField, int page = 1, int pageSize = 10);
-//        Task<int> GetTotalProductsAsync(string searchString, string searchField);
-
-//    }
-//}
+namespace OrderTask.Services.IServices
+{
+    public interface IProductService
+    {
+        Task<MvcPageList<Product>> GetProductsAsync(string searchString, int pageNumber, int pageSize);
+        Task<int> GetTotalProductsAsync(string searchString);
+        Task<Product> GetProductByIdAsync(int id);
+        Task CreateProductAsync(Product product);
+        Task UpdateProductAsync(Product product);
+        Task DeleteProductAsync(Product product);
+    }
+}
