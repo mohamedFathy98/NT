@@ -21,12 +21,19 @@ namespace OrderTask.Services
             if (pageNumber < 1)
                 pageNumber = 1;
 
-            var products = _context.products.AsQueryable();
+            var products = _context.products.AsNoTracking();
             if (!string.IsNullOrEmpty(searchString))
             {
                 searchString = searchString.ToLower();
-                products = products.Where(p => p.Name.ToLower().Contains(searchString) ||
-                                               p.Description.ToLower().Contains(searchString));
+                bool isInt = int.TryParse(searchString, out int idValue);
+                bool isDecimal = decimal.TryParse(searchString, out decimal priceValue);
+
+                products = products.Where(p =>
+                p.Name.ToLower().Contains(searchString) ||
+                p.Description.ToLower().Contains(searchString) ||
+                (isInt && p.Id == idValue) ||
+                (isDecimal && p.Price == priceValue)
+                );
             }
             return await MvcPageList<Product>.CreateAsync(products, pageNumber, pageSize);
         }
@@ -34,7 +41,7 @@ namespace OrderTask.Services
 
         public async Task<int> GetTotalProductsAsync(string searchString)
         {
-            var products = _context.products.AsQueryable();
+            var products = _context.products.AsNoTracking();
             if (!string.IsNullOrEmpty(searchString))
             {
                 searchString = searchString.ToLower();
@@ -65,6 +72,10 @@ namespace OrderTask.Services
         {
             _context.products.Remove(product);
             await _context.SaveChangesAsync();
+        }
+        public async Task<List<Product>> GetAllProductsAsync()
+        {
+            return await _context.products.ToListAsync();
         }
     }
 }

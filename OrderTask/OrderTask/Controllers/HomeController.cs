@@ -1,19 +1,20 @@
 ﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderTask.Controllers.Base;
 using OrderTask.Models;
 
 namespace OrderTask.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : BaseController
     {
-        private readonly ILogger<HomeController> _logger;
-        //private readonly Context _context;
+        private readonly Context _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController( Context context)
         {
-            _logger = logger;
-            
+            _context = context;
+
         }
 
         public IActionResult Index()

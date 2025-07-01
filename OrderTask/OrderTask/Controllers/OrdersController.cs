@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OrderTask.Models;
+using OrderTask.Services.IServices;
 using OrderTask.ViewModel;
 
 namespace OrderTask.Controllers
@@ -12,57 +13,40 @@ namespace OrderTask.Controllers
     {
         private readonly Context _context;
         private readonly IOrderService _orderService;
+        private readonly IProductService _productService;
 
-        public OrdersController(Context context, IOrderService orderService)
+
+        public OrdersController(IProductService productService, Context context, IOrderService orderService)
         {
             _context = context;
             _orderService = orderService;
+            _productService = productService;
         }
 
         // GET: Orders with Search and Pagination
         [AllowAnonymous]
-        public async Task<IActionResult> Index(string searchString, int pageNumber)
+        public async Task<IActionResult> Index(string searchString, int pageNumber = 1)
         {
+            int pageSize = 10;
+            // Ensure pageNumber is at least 1
+            if (pageNumber < 1) pageNumber = 1;
 
-            var order = _context.Orders
-                .Include(o => o.Governorate)
-                .Include(o => o.City)
-                .Include(o => o.ProductOrders)
-                .ThenInclude(op => op.Product)
-                .AsQueryable();
+            // Get paged orders using your service
+            var orders = await _orderService.GetOrderAsync(searchString, pageNumber, pageSize);
 
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                searchString = searchString.ToLower();
-                order = order.Where(o =>
-                    o.Name.ToLower().Contains(searchString) ||
-                    (o.City != null && o.City.Name.ToLower().Contains(searchString)) ||
-                    (o.Governorate != null && o.Governorate.Name.ToLower().Contains(searchString)) ||
-                    o.CreatedBy.ToLower().Contains(searchString) ||
-                    o.ProductOrders.Any(po => po.Product.Price.ToString().Contains(searchString))
-                );
-            }
-
-            if (pageNumber < 1)
-            {
-                pageNumber = 1; // Ensure page number is at least 1
-            }
-            int pageSize = 10; // Adjust page size as needed
-
-            return View(await MvcPageList<Order>.CreateAsync(order, pageNumber, pageSize));
-
+            return View(orders); // orders is MvcPageList<Order>
         }
 
         // GET: Orders/Create
 
-        public IActionResult Create()
+        [HttpGet]
+        public async Task<IActionResult> Create()
         {
-            //retrive data from db to dp
             var viewModel = new ProductOrderViewModel
             {
-                Products = _context.products.ToList(),
-                Governorates = _context.governorates.ToList(),
-                Cities = _context.Cities.ToList()
+                Products = await _productService.GetAllProductsAsync(),
+                Governorates = await _context.governorates.ToListAsync(),
+                Cities = await _context.Cities.ToListAsync()
             };
             return View(viewModel);
         }

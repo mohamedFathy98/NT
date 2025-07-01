@@ -6,8 +6,8 @@ using OrderTask.Models;
 using OrderTask.Utilities;
 using OrderTask.Services.IServices;
 using OrderTask.Services;
-//using OrderTask.Services.IServices;
-//using OrderTask.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 
 namespace OrderTaskServices
 {
@@ -21,7 +21,6 @@ namespace OrderTaskServices
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IProductService, ProductService>();
-            //builder.Services.AddScoped<ISearchService, SearchService>();
             builder.Services.AddScoped<TokenManager>();
             // Register DbContext
             builder.Services.AddDbContext<Context>(options =>
@@ -50,12 +49,20 @@ namespace OrderTaskServices
                             if (!string.IsNullOrEmpty(token))
                             {
                                 context.Token = token;
-                                
+
                             }
                             return Task.CompletedTask;
                         }
                     };
                 });
+            //redirect the user to login page if not authorize 
+            //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            //    .AddCookie(options =>
+            //    {
+            //        options.LoginPath = "/Account/Login";
+            //    });
+
+            //builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
@@ -73,7 +80,7 @@ namespace OrderTaskServices
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Products}/{action=Index}/{id?}");
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
         }

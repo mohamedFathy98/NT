@@ -8,6 +8,7 @@ namespace OrderTask.ViewModel
         public Order Order { get; set; } = new Order();
         public List<Product> Products { get; set; } = new List<Product>();
         public List<Governorate> Governorates { get; set; } = new List<Governorate>();
+
         public List<City> Cities { get; set; } = new List<City>();
         // For binding product quantities from the form
         [NotMapped]

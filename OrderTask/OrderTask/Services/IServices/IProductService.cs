@@ -10,5 +10,6 @@ namespace OrderTask.Services.IServices
         Task CreateProductAsync(Product product);
         Task UpdateProductAsync(Product product);
         Task DeleteProductAsync(Product product);
+        Task<List<Product>> GetAllProductsAsync(); //for creating order
     }
 }

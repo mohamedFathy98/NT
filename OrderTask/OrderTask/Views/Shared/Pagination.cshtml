@@ -1,0 +1,66 @@
+﻿@model dynamic
+@{
+    var routePrefix = ViewData["RoutePrefix"] as string ?? "";
+}
+
+<nav>
+    <ul class="pagination">
+        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "" )">
+            <a class="page-link" asp-route-pageNumber="1">
+                <span>&laquo; First</span>
+            </a>
+        </li>
+        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+            <a class="page-link" asp-route-pageNumber="@(Model.PageIndex - 1)">
+                <span>&lsaquo; Prev</span>
+            </a>
+        </li>
+        @{
+            int startPage = Model.PageIndex - 2;
+            int endPage = Model.PageIndex + 2;
+            if (startPage < 1)
+            {
+                endPage += (1 - startPage);
+                startPage = 1;
+            }
+            if (endPage > Model.TotalPages)
+            {
+                startPage -= (endPage - Model.TotalPages);
+                endPage = Model.TotalPages;
+            }
+            if (startPage < 1) startPage = 1;
+        }
+        @if (startPage > 1)
+        {
+            <li class="page-item disabled">
+                <span class="page-link">
+                    <i class="bi bi-three-dots"></i>
+                </span>
+            </li>
+        }
+        @for (int i = startPage; i <= endPage; i++)
+        {
+            <li class="page-item @(Model.PageIndex == i ? "active" : "")">
+                <a class="page-link" asp-route-pageNumber="@i">@i</a>
+            </li>
+        }
+        @if (endPage < Model.TotalPages)
+        {
+            <li class="page-item disabled">
+                <span class="page-link">
+                    <i class="bi bi-three-dots"></i>
+                </span>
+            </li>
+        }
+        <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+            <a class="page-link" asp-route-pageNumber="@(Model.PageIndex + 1)">
+                <span>Next &rsaquo;</span>
+            </a>
+        </li>
+        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "" )">
+            <a class="page-link" asp-route-pageNumber="@Model.TotalPages">
+                <span>Last &raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>

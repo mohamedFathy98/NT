@@ -117,7 +117,11 @@ namespace OrderTask.Controllers
                 user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
                 _context.SaveChanges();
 
-                var resetLink = Url.Action("ResetPassword", "Account", new { Token = token, email = model.Email }, Request.Scheme);
+                // Combine email and token, then encrypt
+                var combined = $"{model.Email}|{token}";
+                var encryptedCode = EncryptEmail.Encrypt(combined);
+
+                var resetLink = Url.Action("ResetPassword", "Account", new { code = encryptedCode }, Request.Scheme);
                 var email = new EMail
                 {
                     Subject = "Reset Password",
@@ -131,6 +135,8 @@ namespace OrderTask.Controllers
             ModelState.AddModelError(string.Empty, "Email not found");
             return View(model);
         }
+
+
         #endregion
 
         public IActionResult CheckYourInbox()
@@ -139,13 +145,29 @@ namespace OrderTask.Controllers
         }
 
         #region ResetPassword
-        public IActionResult ResetPassword(string email, string token)
+        public IActionResult ResetPassword(string code)
         {
-            if (email == null || token == null) return BadRequest();
-            TempData["Email"] = email;
-            TempData["Token"] = token;
+            if (string.IsNullOrEmpty(code)) return BadRequest();
+
+            string decrypted;
+            try
+            {
+                decrypted = EncryptEmail.Decrypt(code);
+            }
+            catch
+            {
+                return BadRequest("Invalid reset link.");
+            }
+
+            var parts = decrypted.Split('|');
+            if (parts.Length != 2) return BadRequest("Invalid reset link.");
+
+            TempData["Email"] = parts[0];
+            TempData["Token"] = parts[1];
             return View();
         }
+
+
 
         [HttpPost]
         public IActionResult ResetPassword(ResetPassword model)
