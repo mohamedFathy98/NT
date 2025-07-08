@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OrderTask.Models;
+using OrderTask.Services;
 using OrderTask.Services.IServices;
 using OrderTask.ViewModel;
 
@@ -14,9 +15,11 @@ namespace OrderTask.Controllers
         private readonly Context _context;
         private readonly IOrderService _orderService;
         private readonly IProductService _productService;
+       
 
 
-        public OrdersController(IProductService productService, Context context, IOrderService orderService)
+
+        public OrdersController(IProductService productService, Context context, IOrderService orderService  )
         {
             _context = context;
             _orderService = orderService;
@@ -30,8 +33,6 @@ namespace OrderTask.Controllers
             int pageSize = 10;
             // Ensure pageNumber is at least 1
             if (pageNumber < 1) pageNumber = 1;
-
-            // Get paged orders using your service
             var orders = await _orderService.GetOrderAsync(searchString, pageNumber, pageSize);
 
             return View(orders); // orders is MvcPageList<Order>
@@ -68,6 +69,7 @@ namespace OrderTask.Controllers
             viewModel.Cities = _context.Cities.ToList();
             return View(viewModel);
         }
+       
 
     }
 }

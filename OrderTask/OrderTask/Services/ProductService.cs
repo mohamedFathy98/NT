@@ -77,5 +77,24 @@ namespace OrderTask.Services
         {
             return await _context.products.ToListAsync();
         }
+        public async Task<MvcPageList<Product>> SearchProductsForHomeAsync(string searchString, int pageNumber, int pageSize)
+        {
+            var query = _context.products?.AsNoTracking() ?? Enumerable.Empty<Product>().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                bool isPrice = decimal.TryParse(searchString, out decimal priceValue);
+
+                query = query.Where(p =>
+                    (p.Name != null && p.Name.Contains(searchString)) ||
+                     p.Description.ToLower().Contains(searchString) ||
+                    (isPrice && p.Price == priceValue)
+                );
+            }
+
+            return await MvcPageList<Product>.CreateAsync(query, pageNumber, pageSize);
+        }
+
+
     }
 }

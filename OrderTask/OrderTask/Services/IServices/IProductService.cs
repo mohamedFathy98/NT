@@ -11,5 +11,7 @@ namespace OrderTask.Services.IServices
         Task UpdateProductAsync(Product product);
         Task DeleteProductAsync(Product product);
         Task<List<Product>> GetAllProductsAsync(); //for creating order
+        Task<MvcPageList<Product>> SearchProductsForHomeAsync(string searchString, int pageNumber, int pageSize);
+
     }
 }

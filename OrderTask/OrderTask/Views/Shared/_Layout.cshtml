@@ -37,11 +37,17 @@
                         <div>
                             <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary me-2">Login</a>
                             <a asp-controller="Account" asp-action="Register" class="btn btn-outline-success">Register</a>
+
                         </div>
                     }
                     else
                     {
                         <div>
+                            <a asp-controller="Cart">
+                                <button class="btn btn-outline">
+                                    <i class="bi bi-cart3"></i>  
+                                </button>
+                            </a>
                             <span class="navbar-text me-2">Welcome, @User.Identity.Name</span>
                             <a asp-controller="Account" asp-action="SignOut" class="btn btn-outline-danger">Logout</a>
                         </div>

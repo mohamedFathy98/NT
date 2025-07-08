@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderTask.Models;
+using OrderTask.Services;
 using OrderTask.Services.IServices;
 using System.Threading.Tasks;
 
@@ -20,8 +21,6 @@ public class ProductsController : Controller
         int pageSize = 10;
         // Ensure pageNumber is at least 1
         if (pageNumber < 1) pageNumber = 1;
-
-        // Get paged products using your service
         var products = await _productService.GetProductsAsync(searchString, pageNumber, pageSize);
 
         return View(products); // products is MvcPageList<Product>
@@ -82,4 +81,5 @@ public class ProductsController : Controller
         }
         return View(product);
     }
+    
 }

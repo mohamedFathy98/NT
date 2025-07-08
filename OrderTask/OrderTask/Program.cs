@@ -21,7 +21,21 @@ namespace OrderTaskServices
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<ICartService, CartService>(); // Add Cart Service
             builder.Services.AddScoped<TokenManager>();
+
+            // Add Session support
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
+            // Add HttpContextAccessor for session access
+            builder.Services.AddHttpContextAccessor();
+
             // Register DbContext
             builder.Services.AddDbContext<Context>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -49,20 +63,11 @@ namespace OrderTaskServices
                             if (!string.IsNullOrEmpty(token))
                             {
                                 context.Token = token;
-
                             }
                             return Task.CompletedTask;
                         }
                     };
                 });
-            //redirect the user to login page if not authorize 
-            //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            //    .AddCookie(options =>
-            //    {
-            //        options.LoginPath = "/Account/Login";
-            //    });
-
-            //builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
@@ -75,9 +80,9 @@ namespace OrderTaskServices
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseSession(); // Add session middleware
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
